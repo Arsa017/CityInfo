@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CityInfo.Api.Model;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CityInfo.Api.Controllers
 {
@@ -7,18 +8,23 @@ namespace CityInfo.Api.Controllers
     public class CitiesController : ControllerBase
     {
         [HttpGet]
-        public JsonResult GetCities()
+        public ActionResult<IEnumerable<CityDto>> GetCities()
         {
-            return new JsonResult(
-            CityDataStore.Current.Cities
-            );
+            return Ok(CityDataStore.Current.Cities);
         }
 
         [HttpGet("{id}")]       // to work with paramaters currly brackets are used!
-        public JsonResult GetCity(int id)
+        public ActionResult<CityDto> GetCity(int id)
         {
-            return new JsonResult(
-                CityDataStore.Current.Cities.FirstOrDefault(c => c.Id == id));
+            // find city
+            var city = CityDataStore.Current.Cities.FirstOrDefault(c => c.Id == id);
+
+            if (city == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(city);
         } 
     }
 }
