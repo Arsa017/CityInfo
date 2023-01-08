@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
 
 namespace CityInfo.Api.Controllers
 {
@@ -22,7 +23,7 @@ namespace CityInfo.Api.Controllers
             return Ok(city.PointOfInterests);
         }
 
-        [HttpGet("{pointOfInterestId}")]
+        [HttpGet("{pointOfInterestId}", Name = "GetPointOfInterest")]
         public ActionResult<PointOfInterestDto> GetPointOfInterest(int cityId, int pointOfInterestId)
         {
             var city = CityDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
@@ -42,5 +43,39 @@ namespace CityInfo.Api.Controllers
 
             return Ok(pointOfInterest);
         }
+
+        [HttpPost]
+        public ActionResult<PointOfInterestDto> CreatePointOfInterest(      // returns created resourse in the response
+            int cityId, [FromBody] PointsOfInterestForCreationDto pointOfInterest)
+        {
+            var city = CityDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
+            if (city == null)
+            {
+                return NotFound();
+            }
+
+            // demo purposes - to be improved
+            var maxPointOfInterestId = CityDataStore.Current.Cities.SelectMany(
+                c => c.PointOfInterests).Max(p => p.Id);
+
+            var finalPointOfInterest = new PointOfInterestDto()
+            {
+                Id = ++maxPointOfInterestId,
+                Name = pointOfInterest.Name,
+                Description = pointOfInterest.Description
+            };
+
+            city.PointOfInterests.Add(finalPointOfInterest);
+
+            return CreatedAtRoute(routeName: "GetPointOfInterest",
+                routeValues: new
+                {
+                    cityId = cityId,                                    // name of parameters must be the same as the name of action parameters!
+                    pointOfInterestId = finalPointOfInterest.Id
+                },
+                value: finalPointOfInterest
+                );
+        }
+
     }
 }
