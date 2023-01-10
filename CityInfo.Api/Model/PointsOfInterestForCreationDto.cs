@@ -4,7 +4,7 @@ namespace CityInfo.Api.Model
 {
     public class PointsOfInterestForCreationDto
     {
-        [Required]
+        [Required(ErrorMessage = "You should provide a name value.")]
         [MaxLength(50)]
         public string Name { get; set; } = string.Empty;
         [MaxLength(200)]
