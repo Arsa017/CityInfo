@@ -23,7 +23,7 @@ namespace CityInfo.Api.Controllers
         {
             try
             {
-                throw new Exception("Test greska!");
+                //throw new Exception("Test greska!");
                 var city = CityDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
                 if (city == null)
                 {
