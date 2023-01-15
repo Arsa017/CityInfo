@@ -7,17 +7,24 @@ namespace CityInfo.Api.Controllers
     [Route(("api/cities"))]
     public class CitiesController : ControllerBase
     {
+        private readonly CityDataStore _citiesDataStore;
+
+        public CitiesController(CityDataStore citiesDataStore)
+        {
+            _citiesDataStore = citiesDataStore ?? throw new ArgumentNullException(nameof(citiesDataStore));
+        }
+
         [HttpGet]
         public ActionResult<IEnumerable<CityDto>> GetCities()
         {
-            return Ok(CityDataStore.Current.Cities);
+            return Ok(_citiesDataStore.Cities);
         }
 
         [HttpGet("{id}")]       // to work with paramaters currly brackets are used!
         public ActionResult<CityDto> GetCity(int id)
         {
             // find city
-            var city = CityDataStore.Current.Cities.FirstOrDefault(c => c.Id == id);
+            var city = _citiesDataStore.Cities.FirstOrDefault(c => c.Id == id);
 
             if (city == null)
             {

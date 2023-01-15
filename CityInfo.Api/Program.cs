@@ -1,3 +1,4 @@
+using CityInfo.Api;
 using CityInfo.Api.Services;
 using Microsoft.AspNetCore.StaticFiles;
 using Serilog;
@@ -28,7 +29,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
 
-builder.Services.AddTransient<LocalMailServices>();     // adding service to the container; frome these moment on, an instance of service could be injected
+#if DEBUG
+builder.Services.AddTransient<IMailServices, LocalMailServices>();     // adding service to the container; frome these moment on, an instance of service could be injected
+#else
+builder.Services.AddTransient<IMailServices, CloudMailService>();
+#endif
+
+builder.Services.AddSingleton<CityDataStore>();
 
 var app = builder.Build();
 
