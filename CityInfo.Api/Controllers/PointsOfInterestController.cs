@@ -1,4 +1,5 @@
 ﻿using CityInfo.Api.Model;
+using CityInfo.Api.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +13,13 @@ namespace CityInfo.Api.Controllers
     public class PointsOfInterestController : ControllerBase
     {
         private readonly ILogger<PointsOfInterestController> _logger;
+        private readonly LocalMailServices _mailService;
 
-        public PointsOfInterestController(ILogger<PointsOfInterestController> logger)
+        public PointsOfInterestController(ILogger<PointsOfInterestController> logger,
+            LocalMailServices mailService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mailService = mailService ?? throw new ArgumentNullException(nameof(mailService));
         }
 
         [HttpGet]
@@ -180,6 +184,8 @@ namespace CityInfo.Api.Controllers
             }
 
             city.PointOfInterests.Remove(pointOfInterestFromStore);
+            _mailService.Send("Point of interest deleted",
+                $"Point of interest {pointOfInterestFromStore.Name} with id: {pointOfInterestFromStore.Id} was deleted");
             return NoContent();
         }
 

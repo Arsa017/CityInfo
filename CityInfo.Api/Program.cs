@@ -1,3 +1,4 @@
+using CityInfo.Api.Services;
 using Microsoft.AspNetCore.StaticFiles;
 using Serilog;
 
@@ -26,6 +27,8 @@ builder.Services.AddControllers(option =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
+
+builder.Services.AddTransient<LocalMailServices>();     // adding service to the container; frome these moment on, an instance of service could be injected
 
 var app = builder.Build();
 
