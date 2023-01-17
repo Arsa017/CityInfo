@@ -1,6 +1,8 @@
 using CityInfo.Api;
+using CityInfo.Api.DbContexts;
 using CityInfo.Api.Services;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -36,6 +38,9 @@ builder.Services.AddTransient<IMailServices, CloudMailService>();
 #endif
 
 builder.Services.AddSingleton<CityDataStore>();
+
+// regeristing DbContext for depentdency injection as service with Scoped life time 
+builder.Services.AddDbContext<CityInfoContext>(dbContextOptions => dbContextOptions.UseSqlServer("DATA SOURCE=DESKTOP-KTG3JLN\\Aleksandar;DATABASE=CityInfo;UID=sa;PWD=aleksandar"));                      
 
 var app = builder.Build();
 
