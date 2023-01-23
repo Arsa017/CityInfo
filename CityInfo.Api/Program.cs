@@ -41,7 +41,9 @@ builder.Services.AddSingleton<CityDataStore>();
 
 // regeristing DbContext for depentdency injection as service with Scoped life time 
 builder.Services.AddDbContext<CityInfoContext>(
-    dbContextOptions => dbContextOptions.UseSqlServer("DATA SOURCE=DESKTOP-KTG3JLN\\Aleksandar;DATABASE=CityInfo;UID=sa;PWD=aleksandar")
+    dbContextOptions => dbContextOptions.UseSqlServer(
+        builder.Configuration["ConnectionStrings:CityInfoDBConnectionString"]
+    )
 );                      
 
 var app = builder.Build();
