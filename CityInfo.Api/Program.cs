@@ -44,7 +44,9 @@ builder.Services.AddDbContext<CityInfoContext>(
     dbContextOptions => dbContextOptions.UseSqlServer(
         builder.Configuration["ConnectionStrings:CityInfoDBConnectionString"]
     )
-);                      
+);
+
+builder.Services.AddScoped<ICityInfoRepository, CityInfoRepository>();  // registering the repository; scoped lifetime -> it is created one per request
 
 var app = builder.Build();
 
