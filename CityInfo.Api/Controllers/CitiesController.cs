@@ -12,8 +12,7 @@ namespace CityInfo.Api.Controllers
         private readonly ICityInfoRepository _cityInfoRepository;
         private readonly IMapper _mapper;
 
-        public CitiesController(ICityInfoRepository cityInfoRepository,
-            IMapper mapper)                                                                       // we want to inject contract of Mapper, not the exact implementation
+        public CitiesController(ICityInfoRepository cityInfoRepository, IMapper mapper)              // we want to inject contract of Mapper, not the exact implementation
         {
             _cityInfoRepository = cityInfoRepository ?? throw new ArgumentNullException(nameof(cityInfoRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -25,7 +24,6 @@ namespace CityInfo.Api.Controllers
             var cityEntities = await _cityInfoRepository.GetCitiesAsync();
 
             return Ok(_mapper.Map<IEnumerable<CityWithoutPointsOfInterestDto>>(cityEntities));      // mapping each item in the source list to item into destination list
-            //  return Ok(_citiesDataStore.Cities);
         }
 
         [HttpGet("{id}")]       // to work with paramaters currly brackets are used!
@@ -40,10 +38,10 @@ namespace CityInfo.Api.Controllers
 
             if (includePointsOfInterest) 
             {
-                return Ok(_mapper.Map<CityDto>(city));
+                return Ok(_mapper.Map<CityDto>(city));                                  // returns ActionResult<CityDto>   -> needs generic aproach like IActionResult
             }
 
-            return Ok(_mapper.Map<CityWithoutPointsOfInterestDto>(city));
+            return Ok(_mapper.Map<CityWithoutPointsOfInterestDto>(city));               // returns ActionResult<CityWithoutPointsOfInterestDto>
         } 
     }
 }
