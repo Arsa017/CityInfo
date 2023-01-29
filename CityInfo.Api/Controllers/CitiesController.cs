@@ -19,9 +19,11 @@ namespace CityInfo.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CityWithoutPointsOfInterestDto>>> GetCities(string? name)
+        public async Task<ActionResult<IEnumerable<CityWithoutPointsOfInterestDto>>> GetCities(string? name, string? searchQuery)
         {
-            var cityEntities = await _cityInfoRepository.GetCitiesAsync(name);
+            var cityEntities = await _cityInfoRepository.GetCitiesAsync(name, searchQuery);             // searching and filtering will be done in the database, and only the matching cities will be return
+            //var cityEntitiesFiltererd = await _cityInfoRepository.GetCitiesAsync(name, null);         these will fetch all cities from database filtered by name, and than we will filter and search them from memory
+            //cityEntitiesFiltererd.Where(...)
 
             return Ok(_mapper.Map<IEnumerable<CityWithoutPointsOfInterestDto>>(cityEntities));      // mapping each item in the source list to item into destination list
         }
