@@ -1,4 +1,6 @@
-﻿using CityInfo.Api.Model;
+﻿using AutoMapper;
+using CityInfo.Api.Model;
+using CityInfo.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CityInfo.Api.Controllers
@@ -7,31 +9,39 @@ namespace CityInfo.Api.Controllers
     [Route(("api/cities"))]
     public class CitiesController : ControllerBase
     {
-        private readonly CityDataStore _citiesDataStore;
+        private readonly ICityInfoRepository _cityInfoRepository;
+        private readonly IMapper _mapper;
 
-        public CitiesController(CityDataStore citiesDataStore)
+        public CitiesController(ICityInfoRepository cityInfoRepository, IMapper mapper)              // we want to inject contract of Mapper, not the exact implementation
         {
-            _citiesDataStore = citiesDataStore ?? throw new ArgumentNullException(nameof(citiesDataStore));
+            _cityInfoRepository = cityInfoRepository ?? throw new ArgumentNullException(nameof(cityInfoRepository));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<CityDto>> GetCities()
+        public async Task<ActionResult<IEnumerable<CityWithoutPointsOfInterestDto>>> GetCities()
         {
-            return Ok(_citiesDataStore.Cities);
+            var cityEntities = await _cityInfoRepository.GetCitiesAsync();
+
+            return Ok(_mapper.Map<IEnumerable<CityWithoutPointsOfInterestDto>>(cityEntities));      // mapping each item in the source list to item into destination list
         }
 
         [HttpGet("{id}")]       // to work with paramaters currly brackets are used!
-        public ActionResult<CityDto> GetCity(int id)
+        public async Task<IActionResult> GetCity(int id, bool includePointsOfInterest = false)
         {
-            // find city
-            var city = _citiesDataStore.Cities.FirstOrDefault(c => c.Id == id);
+            var city = await _cityInfoRepository.GetCityAsync(id, includePointsOfInterest);
 
             if (city == null)
             {
                 return NotFound();
             }
 
-            return Ok(city);
+            if (includePointsOfInterest) 
+            {
+                return Ok(_mapper.Map<CityDto>(city));                                  // returns ActionResult<CityDto>   -> needs generic aproach like IActionResult
+            }
+
+            return Ok(_mapper.Map<CityWithoutPointsOfInterestDto>(city));               // returns ActionResult<CityWithoutPointsOfInterestDto>
         } 
     }
 }

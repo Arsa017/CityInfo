@@ -11,10 +11,9 @@ namespace CityInfo.Api.Entities
         [Required]
         [MaxLength(50)]
         public string Name { get; set; }
-        [ForeignKey("CityId")]
-
         [MaxLength(200)]
         public string Description { get; set; } = null!;
+        [ForeignKey("CityId")]
         public City? City { get; set; }     
         public int CityId { get; set; }     // navigation property
         public PointOfInterest(string name)
