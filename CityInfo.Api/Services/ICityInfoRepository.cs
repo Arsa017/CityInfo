@@ -8,7 +8,7 @@ namespace CityInfo.Api.Services
 
         Task<City?> GetCityAsync(int cityId, bool includePointsOfInterest);
 
-        Task<IEnumerable<City>> GetCitiesAsync(string? name, string? searchQuery, int PageNumber, int PageSize);
+        Task<(IEnumerable<City>, PaginationMetadata)> GetCitiesAsync(string? name, string? searchQuery, int PageNumber, int PageSize);
         Task<bool> CityExistsAsync(int cityId);
 
         Task<IEnumerable<PointOfInterest>> GetPointsOfInterestForCityAsync(int cityId);

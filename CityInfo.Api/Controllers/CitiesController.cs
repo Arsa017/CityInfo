@@ -2,6 +2,7 @@
 using CityInfo.Api.Model;
 using CityInfo.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using System.Transactions;
 
 namespace CityInfo.Api.Controllers
@@ -30,12 +31,14 @@ namespace CityInfo.Api.Controllers
             }
 
             // searching and filtering will be done in the database, and only the matching cities will be return
-            var cityEntities = await _cityInfoRepository.GetCitiesAsync(name, searchQuery, pageNumber, pageSize);
-            
-            
+            var (cityEntities, paginationMetadata) = await _cityInfoRepository.GetCitiesAsync(name, searchQuery, pageNumber, pageSize);
+
+
             //var cityEntitiesFiltererd = await _cityInfoRepository.GetCitiesAsync(name, null);         these will fetch all cities from database filtered by name, and than we will filter and search them from memory
             //cityEntitiesFiltererd.Where(...)
 
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
+            
             return Ok(_mapper.Map<IEnumerable<CityWithoutPointsOfInterestDto>>(cityEntities));      // mapping each item in the source list to item into destination list
         }
 
