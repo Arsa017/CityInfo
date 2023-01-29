@@ -2,6 +2,8 @@
 using CityInfo.Api.Model;
 using CityInfo.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
+using System.Transactions;
 
 namespace CityInfo.Api.Controllers
 {
@@ -11,6 +13,7 @@ namespace CityInfo.Api.Controllers
     {
         private readonly ICityInfoRepository _cityInfoRepository;
         private readonly IMapper _mapper;
+        const int maxCitiesPageSize = 20;
 
         public CitiesController(ICityInfoRepository cityInfoRepository, IMapper mapper)              // we want to inject contract of Mapper, not the exact implementation
         {
@@ -19,10 +22,23 @@ namespace CityInfo.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CityWithoutPointsOfInterestDto>>> GetCities()
+        public async Task<ActionResult<IEnumerable<CityWithoutPointsOfInterestDto>>> GetCities(string? name, string? searchQuery,
+            int pageNumber = 1, int pageSize = 10)
         {
-            var cityEntities = await _cityInfoRepository.GetCitiesAsync();
+            if (pageSize > maxCitiesPageSize)
+            {
+                pageSize = maxCitiesPageSize;
+            }
 
+            // searching and filtering will be done in the database, and only the matching cities will be return
+            var (cityEntities, paginationMetadata) = await _cityInfoRepository.GetCitiesAsync(name, searchQuery, pageNumber, pageSize);
+
+
+            //var cityEntitiesFiltererd = await _cityInfoRepository.GetCitiesAsync(name, null);         these will fetch all cities from database filtered by name, and than we will filter and search them from memory
+            //cityEntitiesFiltererd.Where(...)
+
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
+            
             return Ok(_mapper.Map<IEnumerable<CityWithoutPointsOfInterestDto>>(cityEntities));      // mapping each item in the source list to item into destination list
         }
 
