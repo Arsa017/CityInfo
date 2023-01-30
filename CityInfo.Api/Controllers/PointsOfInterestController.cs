@@ -12,7 +12,7 @@ using System.Xml.Linq;
 namespace CityInfo.Api.Controllers
 {
     [Route("api/cities/{cityId}/pointsofinterest")]
-    [Authorize]
+    [Authorize(Policy = "MustBeFromAntwerp")]
     [ApiController]
     public class PointsOfInterestController : ControllerBase
     {
